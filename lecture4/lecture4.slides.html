@@ -14213,6 +14213,326 @@ a.anchor-link {
 </div>
 </div>
 
+</div></div></section></section><section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The following data is from https://www.pombase.org/downloads/protein-datasets</span>
+<span class="c1"># It contains the amino acid sequences for proteins in fission yeast</span>
+
+<span class="o">!</span> head ../data/peptide.fa
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&gt;SPAC1002.01:pep
+MLPPTIRISGLAKTLHIPSRSPLQALKGSFILLNKRKFHYSPFILQEKVQSSNHTIRSDT
+KLWKRLLKITGKQAHQFKDKPFSHIFAFLFLHELSAILPLPIFFFIFHSLDWTPTGLPGE
+YLQKGSHVAASIFAKLGYNLPLEKVSKTLLDGAAAYAVVKVSYFVENNMVSSTRPFVSN*
+&gt;SPAC1002.02:pep
+MASTFSQSVFARSLYEDSAENKVDSSKNTEANFPITLPKVLPTDPKASSLHKPQEQQPNI
+IPSKEEDKKPVINSMKLPSIPAPGTDNINESHIPRGYWKHPAVDKIAKRLHDQAPSDRTW
+SRMVSNLFAFISIQFLNRYLPNTTAVKVVSWILQALLLFNLLESVWQFVRPQPTFDDLQL
+TPLQRKLMGLPEGGSTSGKHLTPPRYRPNFSPSRKAENVKSPVRSTTWA*
+&gt;SPAC1002.03c:pep
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">pep_reader</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;../data/peptide.fa&#39;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pepfile</span><span class="p">:</span>
+        <span class="n">pepname</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># start of file</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">pepfile</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span> <span class="c1"># check for prot id line</span>
+                <span class="k">if</span> <span class="n">pepname</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">pepname</span><span class="p">,</span><span class="n">pepseq</span><span class="p">)</span> <span class="c1"># if not first output protein</span>
+                <span class="n">pepname</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span> <span class="c1"># get the id</span>
+                <span class="n">pepseq</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="c1"># init seq</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pepseq</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c1"># append to seq</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pep</span> <span class="o">=</span> <span class="n">pep_reader</span><span class="p">()</span> <span class="c1"># init the iterator</span>
+<span class="n">pepdict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">pep</span><span class="p">}</span> <span class="c1"># make dictionary with gen expression</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pepdict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">]</span> <span class="c1"># first 10 keys</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[29]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;SPAC1002.01&#39;,
+ &#39;SPAC1002.02&#39;,
+ &#39;SPAC1002.03c&#39;,
+ &#39;SPAC1002.04c&#39;,
+ &#39;SPAC1002.05c&#39;,
+ &#39;SPAC1002.06c&#39;,
+ &#39;SPAC1002.07c&#39;,
+ &#39;SPAC1002.08c&#39;,
+ &#39;SPAC1002.09c&#39;,
+ &#39;SPAC1002.10c&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Dictionaries-form-hash-tables">Dictionaries form hash tables<a class="anchor-link" href="#Dictionaries-form-hash-tables">&#182;</a></h2><ul>
+<li>a hash function is used to give the keys integer ids (probably unique but maybe not)</li>
+<li>a hash table maps these ids to values</li>
+</ul>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Hash_table_3_1_1_0_1_0_0_SP.svg/315px-Hash_table_3_1_1_0_1_0_0_SP.svg.png" alt="">
+*image from wikipedia</p>
+
+</div>
+</div>
+</div><div class="fragment">
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pepdict</span><span class="p">[</span><span class="s1">&#39;SPAC1002.01&#39;</span><span class="p">]</span> <span class="c1"># select element</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[30]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;MLPPTIRISGLAKTLHIPSRSPLQALKGSFILLNKRKFHYSPFILQEKVQSSNHTIRSDTKLWKRLLKITGKQAHQFKDKPFSHIFAFLFLHELSAILPLPIFFFIFHSLDWTPTGLPGEYLQKGSHVAASIFAKLGYNLPLEKVSKTLLDGAAAYAVVKVSYFVENNMVSSTRPFVSN*&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></div><div class="fragment">
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">hash</span><span class="p">(</span><span class="s1">&#39;SPAC1002.01&#39;</span><span class="p">)</span> <span class="c1"># the hash value</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[32]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>7592352716679391596</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></div></section></section><section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pep</span> <span class="o">=</span> <span class="n">pep_reader</span><span class="p">()</span> <span class="c1"># init again</span>
+<span class="n">prot_ids</span><span class="p">,</span> <span class="n">prot_seqs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">pep</span><span class="p">)</span> <span class="c1"># make 2 lists</span>
+<span class="n">prot_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">prot_ids</span><span class="p">)</span>
+<span class="n">prot_seqs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">prot_seqs</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lastid</span> <span class="o">=</span> <span class="n">prot_ids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># select last id</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div><div class="fragment">
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">time</span> prot_seqs[prot_ids.index(lastid)] # time selecting using list.index
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 73 µs, sys: 14 µs, total: 87 µs
+Wall time: 88.9 µs
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[41]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;MSAEDLFTIQILCDQIELKLASIVINSNIKLQLKRKKKTQQL*&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></div><div class="fragment">
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">time</span> pepdict[lastid] # time select using dict
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 3 µs, sys: 1 µs, total: 4 µs
+Wall time: 7.39 µs
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[42]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;MSAEDLFTIQILCDQIELKLASIVINSNIKLQLKRKKKTQQL*&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div></div></section></section>
 </div>
 </div>
